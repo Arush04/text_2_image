@@ -1,10 +1,13 @@
-from modelLayers import
+from modelLayers import *
+import random
 import torch
 import numpy as np
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from timm.utils import ModelEmaV3
 from tqdm import tqdm
+import torch.optim as optim
+import torch.nn as nn
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -25,7 +28,7 @@ def train(batch_size: int=64,
           checkpoint_path: str=None):
     set_seed(random.randint(0, 2**32-1)) if seed == -1 else set_seed(seed)
 
-    train_dataset = datasets.MNIST(root='./data', train=True, download=False,transform=transforms.ToTensor())
+    train_dataset = datasets.MNIST(root='./data', train=True, download=True,transform=transforms.ToTensor())
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=4)
 
     scheduler = DDPM_Scheduler(num_time_steps=num_time_steps)
@@ -63,3 +66,6 @@ def train(batch_size: int=64,
         'ema': ema.state_dict()
     }
     torch.save(checkpoint, 'checkpoints/ddpm_checkpoint')
+
+if __name__ == "__main__":
+    train()
